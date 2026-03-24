@@ -96,6 +96,10 @@ const permissionScopes = {
     'integrationStore',
     'integrationEndpointGet',
 
+    // Integration link management (workspace scope)
+    'integrationLinkedBaseList',
+    'integrationUpdateLinkedBases',
+
     // Misc
     'duplicateSharedBase',
     'webhookPluginList',
@@ -243,6 +247,13 @@ const permissionScopes = {
 
     // etc
     'fetchViaUrl',
+
+    // Base-scoped integrations
+    'baseIntegrationList',
+
+    'baseIntegrationCreate',
+    'baseIntegrationLink',
+    'baseIntegrationUnlink',
   ],
 };
 
@@ -323,6 +334,8 @@ const rolePermissions:
       integrationList: true,
       integrationStore: true,
       integrationEndpointGet: true,
+      integrationLinkedBaseList: true,
+      integrationUpdateLinkedBases: true,
       aiSchema: true,
       workspaceUserUpdate: true,
       workspaceUserDelete: true,
@@ -450,6 +463,9 @@ const rolePermissions:
       aiDataGenerateRows: true,
       aiDataFillRows: true,
       aiDataExtractRows: true,
+
+      // Base integrations (read only)
+      baseIntegrationList: true,
 
       // Extensions
       extensionUpdate: true,
@@ -744,6 +760,15 @@ const permissionDescriptions: Record<string, string> = {
   integrationList: 'view list of integrations',
   integrationStore: "get data from an integration's store",
   integrationEndpointGet: 'call get request to an exposed integration endpoint',
+  integrationLinkedBaseList: 'view bases linked to an integration',
+  integrationUpdateLinkedBases: 'update base assignments for an integration',
+
+  // base-scoped integration permissions
+  baseIntegrationList: 'view integrations linked to a base',
+
+  baseIntegrationCreate: 'create an integration from a base',
+  baseIntegrationLink: 'link an integration to a base',
+  baseIntegrationUnlink: 'unlink an integration from a base',
 
   // base permissions
   formViewGet: 'view forms',
