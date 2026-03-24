@@ -161,6 +161,10 @@ export const OPERATION_SCOPES = {
   listViewCreate: 'base',
   listViewUpdate: 'base',
 
+  // Data Import
+  dataImportPreview: 'base',
+  dataImportFile: 'base',
+
   // LTAR V2 conversion
   convertLinkToV2: 'base',
 } as const;
