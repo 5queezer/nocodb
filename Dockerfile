@@ -17,7 +17,7 @@ RUN cd packages/noco-integrations && pnpm install --no-frozen-lockfile && pnpm r
 RUN cd packages/nocodb && pnpm run registerIntegrations || true
 
 # Build frontend (nc-gui)
-RUN cd packages/nc-gui && npx nuxi generate
+RUN cd packages/nc-gui && NODE_OPTIONS="--max-old-space-size=4096" npx nuxi generate
 
 # Bundle backend with rspack
 RUN npx rspack build --config rspack.prod.config.js
