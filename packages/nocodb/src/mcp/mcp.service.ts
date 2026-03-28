@@ -800,9 +800,10 @@ export class McpService {
             const column: any = { title, type, ...options };
 
             if (choices?.length) {
-              column.dtxp = choices
-                .map((c) => `'${c.replace(/'/g, "''")}'`)
-                .join(',');
+              column.options = {
+                ...column.options,
+                choices: choices.map((c) => ({ title: c })),
+              };
             }
 
             const result = await this.columnsV3Service.columnAdd(context, {
