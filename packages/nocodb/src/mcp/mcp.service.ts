@@ -780,7 +780,7 @@ export class McpService {
         {
           title: 'Create Field',
           description:
-            'Add a new field/column to a table. Supported types: SingleLineText, LongText, Number, Decimal, Checkbox, Date, DateTime, SingleSelect, MultiSelect, URL, Email, PhoneNumber, Currency, Percent, Duration, JSON. For SingleSelect/MultiSelect, pass choices as an array of strings: { choices: ["option1", "option2"] }.',
+            'Add a new field/column to a table. Supported types: SingleLineText, LongText, Number, Decimal, Checkbox, Date, DateTime, SingleSelect, MultiSelect, URL, Email, PhoneNumber, Currency, Percent, Duration, JSON. For SingleSelect/MultiSelect, pass choices as an array of strings.',
           inputSchema: {
             tableId: z.string().describe('Table ID'),
             title: z.string().describe('Field name'),
@@ -788,7 +788,7 @@ export class McpService {
             choices: z
               .array(z.string())
               .optional()
-              .describe('Options for SingleSelect/MultiSelect fields'),
+              .describe('Options for SingleSelect/MultiSelect fields (e.g. ["draft", "active", "closed"])'),
             options: z
               .record(z.string(), z.any())
               .optional()
@@ -800,9 +800,9 @@ export class McpService {
             const column: any = { title, type, ...options };
 
             if (choices?.length) {
-              column.colOptions = {
-                options: choices.map((c) => ({ value: c })),
-              };
+              column.dtxp = choices
+                .map((c) => `'${c.replace(/'/g, "''")}'`)
+                .join(',');
             }
 
             const result = await this.columnsV3Service.columnAdd(context, {
