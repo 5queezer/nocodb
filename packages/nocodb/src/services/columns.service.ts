@@ -993,12 +993,7 @@ export class ColumnsService implements IColumnsService {
 
             const hook = await Hook.get(context, colBody.fk_webhook_id);
 
-            if (
-              !hook ||
-              !hook.active ||
-              (hook.version !== 'v3' && hook.event === 'manual') ||
-              (hook.version === 'v3' && !hook.operation?.includes('trigger'))
-            ) {
+            if (!Hook.isManualTrigger(hook)) {
               NcError.get(context).badRequest('Webhook not found');
             }
           } else if (colBody.type === ButtonActionsType.Script) {
@@ -3090,13 +3085,12 @@ export class ColumnsService implements IColumnsService {
             }
           }
         } else if (colBody.type === ButtonActionsType.Webhook) {
-          if (!colBody.fk_webhook_id) {
-            colBody.fk_webhook_id = null;
-          }
-
-          const hook = await Hook.get(context, colBody.fk_webhook_id);
-
-          if (!hook || !hook.active || hook.event !== 'manual') {
+          if (colBody.fk_webhook_id) {
+            const hook = await Hook.get(context, colBody.fk_webhook_id);
+            if (!Hook.isManualTrigger(hook)) {
+              colBody.fk_webhook_id = null;
+            }
+          } else {
             colBody.fk_webhook_id = null;
           }
         } else if (colBody.type === ButtonActionsType.Script) {

@@ -63,6 +63,29 @@ export default class Hook implements HookType {
     }
   }
 
+  public static isManualTrigger(
+    hook?: Partial<Hook | HookReqType> & {
+      version?: string;
+      operation?: string | string[];
+    },
+    options: { requireActive?: boolean } = {},
+  ) {
+    if (!hook) return false;
+    if (options.requireActive !== false && !hook.active) return false;
+
+    if (hook.version === 'v3') {
+      const operation = Array.isArray(hook.operation)
+        ? hook.operation
+        : typeof hook.operation === 'string'
+          ? operationCodeToArr(hook.operation)
+          : [];
+
+      return operation.includes('trigger');
+    }
+
+    return hook.event === 'manual';
+  }
+
   public static async get(
     context: NcContext,
     hookId: string,

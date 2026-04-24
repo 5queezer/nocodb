@@ -86,6 +86,10 @@ export class HooksService {
       param.hook.trigger_field = false;
     }
 
+    if (Hook.isManualTrigger(param.hook as any, { requireActive: false })) {
+      param.hook.active = true;
+    }
+
     if (!option?.isTableDuplicate) {
       validatePayload('swagger.json#/components/schemas/HookReq', param.hook);
     }
@@ -168,6 +172,10 @@ export class HooksService {
       param.hook.trigger_field = false;
     }
 
+    if (Hook.isManualTrigger(param.hook as any, { requireActive: false })) {
+      param.hook.active = true;
+    }
+
     validatePayload('swagger.json#/components/schemas/HookReq', param.hook);
 
     const hook = await Hook.get(context, param.hookId);
@@ -178,15 +186,13 @@ export class HooksService {
 
     this.validateHookPayload(param.hook.notification);
 
-    // If the webhook is being changed to manual trigger, set it to active
-    if (param.hook.event === 'manual') {
-      param.hook.active = true;
-    }
+    const wasManualTrigger = Hook.isManualTrigger(hook);
+    const willBeManualTrigger = Hook.isManualTrigger({
+      ...hook,
+      ...param.hook,
+    } as any);
 
-    if (
-      (hook.active && !param.hook.active) ||
-      hook.event !== param.hook.event
-    ) {
+    if (wasManualTrigger && !willBeManualTrigger) {
       const buttonCols = await Hook.hookUsages(context, param.hookId);
       if (buttonCols.length) {
         for (const button of buttonCols) {
@@ -224,7 +230,7 @@ export class HooksService {
   ) {
     const hook = await Hook.get(context, param.hookId);
 
-    if (!hook && hook.event !== 'manual') {
+    if (!Hook.isManualTrigger(hook)) {
       NcError.get(context).badRequest('Hook not found');
     }
 
@@ -250,7 +256,10 @@ export class HooksService {
         newData: row,
         user: param.req.user,
         context,
-        hookName: 'manual.trigger',
+        hookName:
+          hook.version === 'v3'
+            ? `${hook.event ?? 'manual'}.trigger`
+            : 'manual.trigger',
         ncSiteUrl: param.req.ncSiteUrl,
       });
     } catch (e) {
